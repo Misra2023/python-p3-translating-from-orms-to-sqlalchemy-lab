@@ -1,22 +1,53 @@
-from models import Dog
+# lib/dog.py
 
-def create_table(base):
-    pass
+from .models import Dog
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-def save(session, dog):
-    pass
+# Create the SQLAlchemy engine
+engine = create_engine('sqlite:///dogs.db')
 
-def get_all(session):
-    pass
+# Create a session factory
+Session = sessionmaker(bind=engine)
 
-def find_by_name(session, name):
-    pass
+# Function to create a new dog record
+def create(name, breed, age=None):
+    session = Session()
+    dog = Dog(name=name, breed=breed, age=age)
+    session.add(dog)
+    session.commit()
+    session.close()
 
-def find_by_id(session, id):
-    pass
+# Function to retrieve all dogs
+def get_all():
+    session = Session()
+    dogs = session.query(Dog).all()
+    session.close()
+    return dogs
 
-def find_by_name_and_breed(session, name, breed):
-    pass
+# Function to retrieve a dog by its ID
+def get_by_id(id):
+    session = Session()
+    dog = session.query(Dog).filter_by(id=id).first()
+    session.close()
+    return dog
 
-def update_breed(session, dog, breed):
-    pass
+# Function to update a dog's information
+def update(id, name, breed, age=None):
+    session = Session()
+    dog = session.query(Dog).filter_by(id=id).first()
+    if dog:
+        dog.name = name
+        dog.breed = breed
+        dog.age = age
+        session.commit()
+    session.close()
+
+# Function to delete a dog by its ID
+def delete(id):
+    session = Session()
+    dog = session.query(Dog).filter_by(id=id).first()
+    if dog:
+        session.delete(dog)
+        session.commit()
+    session.close()
